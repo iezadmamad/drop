@@ -79,11 +79,13 @@ export default function TaskJourney() {
       style={{ height: '400vh' }}
     >
       <div className="sticky top-0 h-screen overflow-hidden">
-        <Galaxy
-          autoCenterRepulsion={1.5}
-          rotationSpeed={0.05}
-          density={1.2}
-        />
+        <div className="absolute inset-0 isolation-isolate z-0">
+          <Galaxy
+            autoCenterRepulsion={1.5}
+            rotationSpeed={0.05}
+            density={1.2}
+          />
+        </div>
 
         <div className="absolute inset-0 flex flex-col items-center pt-10 md:pt-20 z-10">
           <h2 className="text-3xl md:text-5xl font-bold gradient-text mb-2">Your Journey to Rewards</h2>
