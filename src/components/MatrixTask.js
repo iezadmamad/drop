@@ -1,10 +1,28 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Twitter, Send, Instagram, MessageSquare, Check, AlertTriangle, ExternalLink } from "lucide-react";
 
 const iconMap = { Twitter, Send, Instagram, MessageSquare };
+
+const sentenceVariants = {
+  hidden: { opacity: 1 },
+  visible: (i = 1) => ({
+    opacity: 1,
+    transition: { staggerChildren: 0.04, delayChildren: 0.2 * i },
+  }),
+};
+
+const letterVariants = {
+  hidden: { opacity: 0, y: 10, filter: "blur(8px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { type: "spring", damping: 12, stiffness: 200 },
+  },
+};
 
 export default function MatrixTask({ task, isActive, isCompleted, onComplete }) {
   const Icon = iconMap[task.icon] || Twitter;
@@ -69,13 +87,18 @@ export default function MatrixTask({ task, isActive, isCompleted, onComplete }) 
           >
             <motion.h3
               key={task.name}
-              initial={{ width: 0 }}
-              animate={{ width: "100%" }}
-              transition={{ duration: 0.8, ease: "steps(25)" }}
-              className="overflow-hidden whitespace-nowrap font-bold text-white text-lg mx-auto"
+              className="font-bold text-white text-lg mx-auto overflow-hidden"
+              variants={sentenceVariants}
+              initial="hidden"
+              animate="visible"
             >
-              {task.name}
+              {task.name.split("").map((char, index) => (
+                <motion.span key={`${char}-${index}`} variants={letterVariants}>
+                  {char === " " ? "\u00A0" : char}
+                </motion.span>
+              ))}
             </motion.h3>
+
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

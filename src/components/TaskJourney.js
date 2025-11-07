@@ -80,12 +80,11 @@ export default function TaskJourney() {
     >
       <div className="sticky top-0 h-screen overflow-hidden">
         <Galaxy
-          isScrolling={isMoving}
           autoCenterRepulsion={1.5}
           rotationSpeed={0.05}
           density={1.2}
         />
-        
+
         <div className="absolute inset-0 flex flex-col items-center pt-10 md:pt-20 z-10">
           <h2 className="text-3xl md:text-5xl font-bold gradient-text mb-2">Your Journey to Rewards</h2>
           <p className="text-gray-400 text-sm md:text-base">Follow the star and complete tasks</p>
@@ -93,7 +92,12 @@ export default function TaskJourney() {
           <div className="w-full flex-1 relative overflow-hidden">
             <motion.div
               className="absolute top-0 left-1/2"
-              style={{ y: verticalScroll, x: "-50%", willChange: "transform" }}
+              style={{
+                y: verticalScroll,
+                x: "-50%",
+                willChange: "transform",
+                transform: "translateZ(0)"
+              }}
             >
               <div className="relative" style={{ width: `${pathWidth}px`, height: `${pathLength}px` }}>
                 <svg width={pathWidth} height={pathLength} className="absolute inset-0 overflow-visible">

@@ -7,7 +7,6 @@ import TaskJourney from "@/components/TaskJourney";
 import Dashboard from "@/components/Dashboard";
 import WindTurbineGame from "@/components/WindTurbineGame";
 import FloatingReward from "@/components/FloatingReward";
-import ParticlesBackground from "@/components/ParticlesBackground";
 import Loading from "@/components/Loading";
 import ScrollProgress from "@/components/ScrollProgress";
 import BackgroundLines from "@/components/BackgroundLines";
@@ -41,11 +40,11 @@ export default function Home() {
 
   return (
     <>
-      <motion.div 
-        className="fixed top-0 left-0 right-0 h-2 bg-gradient-to-r from-gold to-nature-green origin-left z-50" 
-        style={{ scaleX }} 
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-2 bg-gradient-to-r from-gold to-nature-green origin-left z-50"
+        style={{ scaleX }}
       />
-      
+
       <AnimatePresence>
         {isLoading && (
           <Loading key="loading" onComplete={() => setIsLoading(false)} />
@@ -55,12 +54,11 @@ export default function Home() {
       {!isLoading && (
         <main className="relative">
           <BackgroundLines />
-          <ParticlesBackground />
           <ScrollProgress />
           <FloatingReward />
 
           <Hero />
-          
+
           <section className="bg-black py-20">
              <AirdropCountdown />
              <div className="max-w-sm mx-auto mt-16">
@@ -88,7 +86,7 @@ export default function Home() {
                 Empowering sustainable energy through blockchain technology
               </p>
             </div>
-            
+
             <AnimatePresence>
               {showReturn && (
                 <motion.div

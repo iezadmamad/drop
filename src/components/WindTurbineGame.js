@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Zap, Play, Circle, Settings, ArrowRight, Wind, X, Gauge, Target } from "lucide-react";
 import { useUser } from "@/context/UserContext";
-import { config } from "@/lib/config";
 import Image from 'next/image';
 
 function GameTutorial({ onComplete, onSkip, windHeight }) {
@@ -111,13 +110,13 @@ function GameTutorial({ onComplete, onSkip, windHeight }) {
               animate={{ scale: 1, rotate: 0 }}
               transition={{ type: "spring", delay: 0.2 }}
               className="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center relative"
-              style={{ 
+              style={{
                 background: `linear-gradient(135deg, ${currentStep.color}, ${currentStep.color}88)`,
                 boxShadow: `0 0 40px ${currentStep.color}66`
               }}
             >
               <Icon className="w-12 h-12 text-white" />
-              
+
               <motion.div
                 className="absolute inset-0 rounded-full border-2 pointer-events-none"
                 style={{ borderColor: currentStep.color }}
@@ -178,7 +177,7 @@ function GameTutorial({ onComplete, onSkip, windHeight }) {
                   Back
                 </motion.button>
               )}
-              
+
               <motion.button
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -186,7 +185,7 @@ function GameTutorial({ onComplete, onSkip, windHeight }) {
                 whileTap={{ scale: 0.95 }}
                 onClick={nextStep}
                 className="px-8 py-3 rounded-full font-bold text-black flex items-center gap-2 cursor-pointer"
-                style={{ 
+                style={{
                   background: `linear-gradient(135deg, ${currentStep.color}, ${currentStep.color}dd)`,
                   pointerEvents: 'auto'
                 }}
@@ -211,67 +210,76 @@ function GameTutorial({ onComplete, onSkip, windHeight }) {
   );
 }
 
-function Turbine({ height, isOptimal, windHeight }) {
-  const bladeSpeed = isOptimal ? 2 : 10;
-  const displayHeight = height * 0.7 + windHeight * 0.3;
-  const towerHeight = displayHeight * 4.5;
-  const bladePosition = towerHeight + 20;
+function Turbine({ height, isOptimal }) {
+  const minHeightPx = 80;
+  const maxHeightPx = 420;
+  const towerHeight = minHeightPx + ((height - 20) / 80) * (maxHeightPx - minHeightPx);
+
+  const markers = [20, 40, 60, 80, 100];
 
   return (
-    <div className="relative flex flex-col items-center justify-end" style={{ height: '500px' }}>
+    <div className="relative w-full h-[500px] flex justify-center items-end">
       <motion.div
-        className="absolute z-10"
-        initial={{ bottom: `${bladePosition}px` }}
-        animate={{ bottom: `${bladePosition}px` }}
+        className="absolute left-0 bottom-10 h-[420px] flex flex-col justify-between"
+        initial={{ y: (100 - height) * 3 }}
+        animate={{ y: (100 - height) * 3 }}
         transition={{ type: "spring", stiffness: 80, damping: 20 }}
       >
-        <div className="relative w-40 h-40 flex items-center justify-center">
-          <motion.div
-            className="absolute inset-0 flex items-center justify-center"
-            style={{ transform: 'perspective(500px) rotateY(-40deg)' }}
-            animate={isOptimal ? { rotate: 360 } : { rotate: 0 }}
-            transition={isOptimal ? { duration: bladeSpeed, repeat: Infinity, ease: "linear" } : {}}
-          >
-            <Image
-              src="/pare.png"
-              alt="Turbine Blades"
-              width={160}
-              height={160}
-              className={`object-contain drop-shadow-2xl ${isOptimal ? 'filter hue-rotate-90 brightness-125' : ''}`}
-            />
-          </motion.div>
-        </div>
-      </motion.div>
-
-      <motion.div
-        className="w-3 mx-auto relative bg-gradient-to-t from-gray-800 via-gray-700 to-gray-600 rounded-t-sm shadow-lg"
-        initial={{ height: '400px' }}
-        animate={{ height: `${towerHeight}px` }}
-        transition={{ type: "spring", stiffness: 80, damping: 20 }}
-      >
-        {[...Array(5)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute left-6 text-xs font-bold"
-            style={{
-              bottom: `${i * 20}%`,
-              color: isOptimal ? '#FFD700' : '#6b7280',
-            }}
-          >
-            {Math.round((i * displayHeight) / 4)}m
+        {markers.map((m) => (
+          <div key={m} className="flex items-center gap-2 text-gray-500">
+            <span className="text-xs font-bold w-8 text-right">{m}m</span>
+            <div className="w-4 h-px bg-gray-500" />
           </div>
         ))}
       </motion.div>
 
-      <div className="relative w-16 h-6 bg-gradient-to-b from-gray-700 to-gray-800 rounded-b-lg mx-auto shadow-lg">
-        <Image
-          src="/stan.png"
-          alt="Turbine Base"
-          fill
-          className="object-cover rounded-b-lg"
-        />
+      <div className="relative flex flex-col items-center">
+        <motion.div
+          className="absolute z-10 bottom-0"
+          initial={{ y: -towerHeight }}
+          animate={{ y: -towerHeight }}
+          transition={{ type: "spring", stiffness: 80, damping: 20 }}
+        >
+          <div className="relative flex flex-col items-center">
+            <div className="w-20 h-10 bg-gray-700 rounded-t-md rounded-b-sm shadow-inner" />
+            
+            <div className="relative w-40 h-40 flex items-center justify-center -mt-6">
+              <motion.div
+                className="absolute"
+                animate={isOptimal ? { rotate: 360 } : { rotate: 0 }}
+                transition={isOptimal ? { duration: 2, repeat: Infinity, ease: "linear" } : {}}
+              >
+                <Image
+                  src="/pare.png"
+                  alt="Turbine Blades"
+                  width={160}
+                  height={160}
+                  className={`object-contain drop-shadow-2xl transition-all duration-500 ${isOptimal ? "filter hue-rotate-90 brightness-125" : ""}`}
+                  priority
+                />
+              </motion.div>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className="relative w-8 rounded-t-sm overflow-hidden"
+          initial={{ height: towerHeight }}
+          animate={{ height: towerHeight }}
+          transition={{ type: "spring", stiffness: 80, damping: 20 }}
+        >
+          <Image
+            src="/stan.png"
+            alt="Turbine Tower"
+            fill
+            className="object-cover object-bottom"
+            quality={100}
+          />
+        </motion.div>
+        
+        <div className="w-16 h-4 bg-gradient-to-b from-gray-700 to-gray-800 rounded-b-lg" />
+        <div className="w-20 h-1 mt-0.5 bg-gray-900 rounded-full" />
       </div>
-      <div className="w-20 h-2 rounded-full mt-1 bg-gray-900/50" />
     </div>
   );
 }
@@ -279,32 +287,38 @@ function Turbine({ height, isOptimal, windHeight }) {
 function WindEffect({ isOptimal, turbineHeight }) {
   if (!isOptimal) return null;
 
-  const whiteWindLines = 25;
-  const blackWindLines = 12;
+  const minHeightPx = 80;
+  const maxHeightPx = 420;
+  const towerHeight = minHeightPx + ((turbineHeight - 20) / 80) * (maxHeightPx - minHeightPx);
+  
+  const windPosition = 500 - towerHeight - 80;
+
+  const windLines = 25;
 
   return (
-    <div className="absolute left-0 right-0 overflow-hidden pointer-events-none z-20" style={{ 
-      height: '200px',
-      top: 'calc(50% - 180px)',
-      transform: 'translateY(-50%)'
-    }}>
-      {[...Array(whiteWindLines)].map((_, i) => {
+    <motion.div 
+      className="absolute inset-x-0 h-[200px] overflow-hidden pointer-events-none z-20"
+      initial={{ bottom: windPosition }}
+      animate={{ bottom: windPosition }}
+      transition={{ type: "spring", stiffness: 80, damping: 20 }}
+    >
+      {[...Array(windLines)].map((_, i) => {
         const duration = 1.2 + Math.random() * 1;
-        const verticalOffset = (Math.random() - 0.5) * 120;
+        const verticalOffset = (Math.random() - 0.5) * 150;
 
         return (
           <motion.div
-            key={`wind-white-${i}`}
+            key={`wind-${i}`}
             className="absolute h-px"
             style={{
               width: `${100 + Math.random() * 150}px`,
-              background: 'linear-gradient(to right, transparent, rgba(255, 255, 255, 0.8), transparent)',
+              background: 'linear-gradient(to right, transparent, rgba(255, 255, 255, 0.6), transparent)',
               top: `calc(50% + ${verticalOffset}px)`,
               left: '-200px',
               filter: 'blur(0.5px)',
             }}
             animate={{
-              x: [0, window.innerWidth + 400],
+              x: [0, typeof window !== 'undefined' ? window.innerWidth + 400 : 1000],
             }}
             transition={{
               x: {
@@ -317,37 +331,7 @@ function WindEffect({ isOptimal, turbineHeight }) {
           />
         );
       })}
-
-      {[...Array(blackWindLines)].map((_, i) => {
-        const duration = 1.8 + Math.random() * 1.2;
-        const verticalOffset = (Math.random() - 0.5) * 140;
-
-        return (
-          <motion.div
-            key={`wind-black-${i}`}
-            className="absolute h-0.5"
-            style={{
-              width: `${60 + Math.random() * 100}px`,
-              background: 'linear-gradient(to right, transparent, rgba(0, 0, 0, 0.6), transparent)',
-              top: `calc(50% + ${verticalOffset}px)`,
-              left: '-200px',
-              filter: 'blur(1px)',
-            }}
-            animate={{
-              x: [0, window.innerWidth + 400],
-            }}
-            transition={{
-              x: {
-                duration: duration,
-                repeat: Infinity,
-                ease: "linear",
-                delay: Math.random() * duration,
-              },
-            }}
-          />
-        );
-      })}
-    </div>
+    </motion.div>
   );
 }
 
@@ -424,14 +408,18 @@ export default function WindTurbineGame() {
 
   const initializeSounds = () => {
     if (!soundsEnabled) {
-      windSoundRef.current = new Audio('/hood.mp3');
-      windSoundRef.current.loop = false;
-      windSoundRef.current.volume = 0.5;
-      
-      bipSoundRef.current = new Audio('/bip.mp3');
-      bipSoundRef.current.volume = 0.6;
-      
-      setSoundsEnabled(true);
+      try {
+        windSoundRef.current = new Audio('/hood.mp3');
+        windSoundRef.current.loop = false;
+        windSoundRef.current.volume = 0.5;
+
+        bipSoundRef.current = new Audio('/bip.mp3');
+        bipSoundRef.current.volume = 0.6;
+
+        setSoundsEnabled(true);
+      } catch (e) {
+        console.error("Audio could not be initialized.", e);
+      }
     }
   };
 
@@ -474,7 +462,7 @@ export default function WindTurbineGame() {
       setTimeToNextChange(prev => {
         if (prev <= 1) {
           setWindHeight(nextWindHeight);
-          setNextWindHeight(20 + Math.random() * 80);
+          setNextWindHeight(Math.floor(20 + Math.random() * 81));
           return getRandomInterval();
         }
         return prev - 1;
@@ -489,7 +477,7 @@ export default function WindTurbineGame() {
   }, [turbineHeight, windHeight]);
 
   useEffect(() => {
-    if (!soundsEnabled || !bipSoundRef.current) return;
+    if (!soundsEnabled || !bipSoundRef.current || typeof window === 'undefined') return;
 
     if (isPlaying && isOptimal && lastOptimalStateRef.current !== isOptimal) {
       bipSoundRef.current.currentTime = 0;
@@ -499,7 +487,7 @@ export default function WindTurbineGame() {
   }, [isOptimal, isPlaying, soundsEnabled]);
 
   useEffect(() => {
-    if (!soundsEnabled || !windSoundRef.current) return;
+    if (!soundsEnabled || !windSoundRef.current || typeof window === 'undefined') return;
 
     if (windLoopIntervalRef.current) {
       clearInterval(windLoopIntervalRef.current);
@@ -512,7 +500,7 @@ export default function WindTurbineGame() {
           windSoundRef.current.play().catch(e => console.error("Wind sound error:", e));
         }
       };
-      
+
       playWindSound();
       windLoopIntervalRef.current = setInterval(playWindSound, 10000);
     } else {
@@ -524,11 +512,10 @@ export default function WindTurbineGame() {
   }, [isOptimal, isPlaying, soundsEnabled]);
 
   useEffect(() => {
-    if (!soundsEnabled || !windSoundRef.current) return;
-    
+    if (!soundsEnabled || !windSoundRef.current || typeof window === 'undefined') return;
+
     if (isPlaying && isOptimal) {
       const targetVolume = proximity > 0.1 ? proximity * 0.7 : 0;
-      
       if (windSoundRef.current.volume !== targetVolume) {
         windSoundRef.current.volume = targetVolume;
       }
@@ -581,28 +568,27 @@ export default function WindTurbineGame() {
     <section ref={gameSectionRef} id="game-active" className="min-h-screen bg-black relative flex flex-col lg:flex-row items-center justify-center overflow-hidden p-4 lg:p-8">
       <AnimatePresence>
         {showTutorial && (
-          <GameTutorial 
+          <GameTutorial
             onComplete={handleTutorialComplete}
             onSkip={handleTutorialSkip}
             windHeight={windHeight}
           />
         )}
       </AnimatePresence>
-
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <WindEffect isOptimal={isOptimal} turbineHeight={turbineHeight} />
-      </div>
+      
+      <AnimatedBackground />
+      <WindEffect isOptimal={isOptimal} turbineHeight={turbineHeight} />
 
       <div className="w-full lg:w-1/3 h-full flex flex-col items-center justify-center p-4 z-10">
-        <Turbine height={turbineHeight} isOptimal={isOptimal} windHeight={windHeight} />
+        <Turbine height={turbineHeight} isOptimal={isOptimal} />
         <div className="mt-8 flex items-center gap-2 w-full max-w-xs relative">
           <Settings className="w-6 h-6 text-gold" />
-          <input 
-            type="range" 
-            min="20" 
-            max="100" 
-            value={turbineHeight} 
-            onChange={handleSliderChange} 
+          <input
+            type="range"
+            min="20"
+            max="100"
+            value={turbineHeight}
+            onChange={handleSliderChange}
             className="w-full accent-gold"
           />
           <span className="font-bold text-lg text-gold w-16 text-center">{turbineHeight}m</span>
